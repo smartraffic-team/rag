@@ -1,34 +1,13 @@
-# 01 — Visão do produto e escopo
+# 01 — Visão e escopo
 
-## Problema e objetivo
-- **Nome oficial:** SmartTraffic (evitar `SmarTraffic` e `Smartrafic` em documentação nova; nomes legados de arquivos podem permanecer até migração).
-- **Objetivo principal (DECIDIDO):** reduzir o tempo de espera de veículos no trânsito.
-- **Pesquisa:** investigar eficiência e viabilidade técnica de controle semafórico adaptativo em um cruzamento simulado.
-- **Entregas acadêmicas declaradas:** MVP e artigo, destinados a evento e publicação científica. Prazo exato não informado.
-- **Público do painel administrativo:** funcionários responsáveis pelo trânsito; não é aplicativo para cidadãos.
-- **ODS adotados:** ODS 9 (Indústria, Inovação e Infraestrutura) e ODS 11 (Cidades e Comunidades Sustentáveis). Benefícios ainda são objetivos, não resultados comprovados.
+SmartTraffic é um protótipo acadêmico para **um único cruzamento**, com vias A/B, dois conjuntos semafóricos, miniaturas Hot Wheels, processamento local Python + OpenCV + YOLOv8n e Arduino. Hipótese: adaptar o tempo de sinalização à quantidade de veículos aguardando pode reduzir espera em relação à temporização fixa.
 
-## Limites do MVP (DECIDIDO / PLANEJADO)
-- **Um único cruzamento** e maquete acadêmica, sem intervenção no trânsito real.
-- Veículos **e pedestres**, incluindo atenção à acessibilidade de PCD, como escopo desejado. O mecanismo específico de acessibilidade **não foi definido**.
-- Câmera/webcam observa modelos Hot Wheels; notebook executa software Python; Arduino aciona sinalização da maquete.
-- Priorizar a via conforme **quantidade de veículos em espera**; algoritmo detalhado ainda não está implementado na forma desejada.
-- Tempo de verde **máximo configurável por sinal**. Valor de **19 segundos** citado como padrão provisório, mas ainda não está claro se representa verde padrão, máximo ou configuração inicial.
-- Se câmera/software falharem, **retornar a um fluxo padrão**. Exigência registrada, implementação segura de failover ainda pendente.
-- Validação: comparar, na maquete, o **tempo de espera** com temporização fixa versus adaptativa.
+**Maquete física:** detecção de carros/pessoas e atuação preliminar por serial já possuem código; duas câmeras simultâneas, contagem distinta das filas, desempate pelo veículo mais antigo, atendimento aos pedestres e lógica segura ainda são metas. Acessibilidade/identificação de PCD não é objetivo obrigatório v1; não inferir deficiência pela aparência.
 
-## Fora do escopo confirmado
-- Coordenação operacional de diversos cruzamentos.
-- Operação em vias públicas reais.
-- Reconhecimento de deficiência de uma pessoa a partir de imagem — **não foi demonstrado**, nem definido como abordagem técnica.
-- Detecção e alerta médico automático: menção em texto antigo do artigo, tratada como ideia futura, não requisito aprovado.
-- Redução quantificada de emissões, gasto de combustível ou acidentes — **não medida**.
+**SUMO:** simula isoladamente a estratégia adaptativa, com sensores E2 em vez de visão computacional. Melhora virtual de 13,5%, não física.
 
-## Vocabulário
-- **Detecção por quadro:** número de objetos detectados em uma imagem específica; não significa veículos únicos.
-- **Rastreamento:** manutenção de identidade do objeto ao longo do vídeo.
-- **Contagem por via/fila:** veículos em região de interesse específica aguardando passagem; ainda precisa especificação.
-- **Controle fixo:** algoritmo que alterna fases segundo tempos predefinidos.
-- **Controle adaptativo:** algoritmo que altera decisões/tempos conforme demanda e regras de segurança.
-- **Edge:** parte do processamento próxima à câmera/controlador.
-- **Nuvem:** serviços externos para histórico, administração e eventual processamento; divisão pendente.
+**IoT:** dados de dispositivos/semáforos chegam à API e MySQL, consumidos por React e mobile futuro; o controle físico não pode depender da rede.
+
+**ODS 9/11:** alinhamento potencial à inovação e mobilidade sustentável, sem benefício urbano mensurado.
+
+**Termos:** detecção por quadro ≠ veículo único ≠ fila em espera; lógica fuzzy (difusa) é citada no Estado da Arte, não constitui algoritmo SmartTraffic.

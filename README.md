@@ -1,41 +1,33 @@
-# SmartTraffic — Repositório de contexto compartilhado
+# SmartTraffic — RAG atualizado (05/11/2026)
 
-> **Snapshot de contexto:** 10/10/2026. **Idioma:** pt-BR. **Nome oficial:** SmartTraffic.  
-> Este repositório é uma **base de conhecimento**, não o código-fonte dos sistemas. Informações oriundas de conversas e materiais acadêmicos devem ser confrontadas com o código e validadas pela equipe antes de uso operacional.
+> Base de conhecimento em português. **Um cruzamento, vias A/B, dois semáforos**, maquete acadêmica. Separar código existente, testes virtuais e validação física.
 
-## O que é
-Projeto acadêmico de protótipo semafórico inteligente que utiliza visão computacional para detectar veículos e pedestres em uma **maquete representando um único cruzamento**. A finalidade de pesquisa é avaliar se um controle adaptativo baseado na demanda consegue reduzir o **tempo médio de espera dos veículos**, comparado a um controle de tempo fixo.
+**SmartTraffic:** proposta de controle semafórico adaptativo com webcam(s), Python/OpenCV/YOLOv8n e Arduino via serial USB. A maquete é o projeto central. A implementação física de contagem independente por via, fase de pedestres, failover seguro e validação quantitativa ainda está pendente.
 
-A equipe usa Python, OpenCV, **YOLOv8n** e Arduino no protótipo. Uma plataforma web está sendo iniciada com React + TypeScript e dados mockados; para o backend futuro foram escolhidos NestJS + Prisma + **MySQL**. A arquitetura desejada é híbrida, mas a divisão detalhada entre processamento local e AWS permanece pendente.
+**Resultado científico:** simulação complementar no **SUMO 1.28.0**, 10 pares de repetições (20 rodadas), 125 veículos por rodada, espera média fixa **4,44 s** contra adaptativa **3,84 s** (**13,5% menor**) no cenário virtual. O SUMO utiliza sensores virtuais, não YOLO/Arduino; **não atribuir 13,5% à maquete**.
 
-## Leia nesta ordem
-1. [`docs/01-visao-produto.md`](docs/01-visao-produto.md) — problema, escopo, objetivos, atores e requisitos.
-2. [`docs/02-estado-atual-evidencias.md`](docs/02-estado-atual-evidencias.md) — **implementado × relatado × planejado**.
-3. [`docs/03-arquitetura-integracoes.md`](docs/03-arquitetura-integracoes.md) — sistemas, comunicação e decisões ainda abertas.
-4. [`docs/04-computer-vision.md`](docs/04-computer-vision.md) — leitura do código Python de referência.
-5. [`docs/05-arduino.md`](docs/05-arduino.md) — firmware, sinais, limitações de segurança.
-6. [`docs/06-plataforma-web.md`](docs/06-plataforma-web.md) — stack, telas, contratos e dados mockados.
-7. [`docs/07-dados-e-telemetria.md`](docs/07-dados-e-telemetria.md) — entidades e proposta de payload (não implementado).
-8. [`docs/08-pesquisa-e-artigo.md`](docs/08-pesquisa-e-artigo.md) — pesquisas de campo e diretrizes científicas.
-9. [`docs/09-roadmap-e-validacao.md`](docs/09-roadmap-e-validacao.md) — fases e desenho dos experimentos.
-10. [`docs/10-pendencias-e-riscos.md`](docs/10-pendencias-e-riscos.md) — decisões, riscos e dúvidas.
-11. [`docs/11-fontes-e-rastreabilidade.md`](docs/11-fontes-e-rastreabilidade.md) — inventário e procedência.
-12. [`adr/README.md`](adr/README.md) — registro de decisões técnicas.
+**Software:** banco [MySQL V2.1](https://github.com/smartraffic-team/database) com Docker/CI e scripts; [API NestJS/Prisma](https://github.com/smartraffic-team/api) com JWT e ingestão autenticada; [plataforma React](https://github.com/smartraffic-team/SmartTraffic-platform) com consumo HTTP da API. O repositório [Mobile](https://github.com/smartraffic-team/Mobile) ainda possui somente README/LICENSE em main. Código disponível não prova implantação ou integração ponta a ponta.
 
-## Semântica dos estados
-- **IMPLEMENTADO NO CÓDIGO:** rotina presente em arquivo inspecionado; **não equivale** a ensaio bem-sucedido.
-- **RELATADO PELA EQUIPE:** informação declarada por integrante, sem verificação independente.
-- **DECIDIDO:** escolha de escopo ou tecnologia explicitamente comunicada.
-- **PLANEJADO:** funcionalidade desejada, ainda não confirmada como implementada.
-- **PENDENTE:** necessita definição, teste, documentação ou aprovação.
-- **PROPOSTO NESTA DOCUMENTAÇÃO:** sugestão de arquitetura/contrato, não decisão da equipe.
+## Índice
+- [01 Visão](docs/01-visao-produto.md)
+- [02 Estado atual](docs/02-estado-atual-evidencias.md)
+- [03 Arquitetura](docs/03-arquitetura-integracoes.md)
+- [04 Visão computacional](docs/04-computer-vision.md)
+- [05 Arduino](docs/05-arduino.md)
+- [06 Web/mobile](docs/06-plataforma-web.md)
+- [07 Banco e telemetria](docs/07-dados-e-telemetria.md)
+- [08 Artigo e pesquisa](docs/08-pesquisa-e-artigo.md)
+- [09 Roadmap](docs/09-roadmap-e-validacao.md)
+- [10 Riscos](docs/10-pendencias-e-riscos.md)
+- [11 Fontes](docs/11-fontes-e-rastreabilidade.md)
+- [12 SUMO](docs/12-sumo-experimentos.md)
+- [13 Banco/API](docs/13-database-api.md)
 
-## Repositórios de software confirmados
-- [Arduino](https://github.com/smartraffic-team/arduino) — arquivo `arduino_code.ino` na branch `main`.
-- [Computer Vision](https://github.com/smartraffic-team/computer-vision) — **`Teste_camera.py` é a versão mais atual, conforme confirmado pela equipe**.
+## Status
+- **IMPLEMENTADO NO REPOSITÓRIO:** código inspecionado; funcionamento em campo não garantido.
+- **TESTADO EM SIMULAÇÃO:** experimento SUMO reproduzível, não valida hardware.
+- **RELATADO:** informado pela equipe em artigo/conversa.
+- **PLANEJADO/PENDENTE:** ainda sem evidência de implementação concluída.
+- **DOCUMENTADO COMO TESTADO:** relatório/testes existem, mas não reexecutados nesta revisão.
 
-## Regra de atualização
-Toda alteração material deve indicar **data, responsável, origem, sistemas impactados e estado**. Para decisões novas, registre um ADR; para funcionalidades concluídas, atualize o quadro de status e linke commit/PR/teste. **Não edite o histórico para converter planos em fatos**.
-
-## Limites de aplicação
-O firmware e scripts descritos são de **maquete acadêmica** e **não devem ser usados para controlar tráfego em via pública** sem projeto formal, redundância, intertravamento, conformidade e validação por profissionais competentes.
+O banco e a API não devem comandar diretamente os LEDs; o controle seguro precisa continuar local. Projeto exclusivamente didático, não homologado para sinalização de via pública.
