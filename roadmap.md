@@ -2,7 +2,10 @@
 
 Use este documento como contexto e plano de trabalho para evoluir o SmartTraffic até uma demonstração ponta a ponta na maquete. Trabalhe por etapas, mantendo cada entrega pequena, verificável e compatível com o código que existe neste workspace.
 
-**Prioridade revisada em 09/11/2026:** primeiro concluir e validar todo o fluxo com uma única câmera; depois ampliar para duas. Esta sequência substitui a ordem anterior, que exigia duas câmeras desde o início. A captura e a interface local já foram refatoradas para uma câmera; a integração completa ainda está pendente.
+**Prioridade revisada em 12/11/2026:** o funcionamento com uma camera foi validado pelo usuario. A expansao para duas cameras esta autorizada e em andamento; uma captura independente e atribuida a cada via, com processamento, estado e envio de leituras separados.
+
+**Escopo desta etapa:** conferir a captura isolada A/B com indices distintos; exibir os dois streams no Flask e na plataforma; manter contagens, estimativas de espera e falhas separadas; controlar as duas vias pelo mesmo Arduino; enviar leituras de cada camera para a via cadastrada correspondente. Se uma camera falhar, a outra continua capturando e a via sem medicao nao gera demanda ficticia.
+
 
 ## Objetivo final
 
@@ -22,10 +25,10 @@ O controle físico deve continuar no computador local e no Arduino. A operação
 
 Antes de implementar cada etapa, reexamine os arquivos atuais. Este resumo reúne a inspeção de 05/11/2026 e a revisão de visão computacional e plataforma em 09/11/2026; código existente não comprova execução integrada.
 
-- `computer-vision/Teste_camera.py` é a entrada principal de uma câmera, configurável por índice e via observada (A por padrão). `vision.py` separa captura e detecção em threads, delimita uma região de contagem, tenta reconectar a câmera e invalida leituras antigas ou produzidas antes de uma desconexão. O Flask exibe um feed, carros/pessoas por quadro e a outra via como sem medição. Não há rastreamento de veículos únicos nem estimativa de fila.
+- `computer-vision/Teste_camera.py` é a entrada principal de uma câmera, configurável por índice e via observada (A por padrão). `vision.py` separa captura e detecção em threads, delimita uma região de contagem, tenta reconectar a câmera e invalida leituras antigas ou produzidas antes de uma desconexão. Um rastreador simples de centros das caixas estima veículos parados na região configurada; não identifica veículos únicos nem estima comprimento de fila.
 - `computer-vision/Smartrafic_web.py` é um atalho para a mesma aplicação, sem abrir outra câmera. A configuração e a execução estão documentadas no README.
 - A captura da Logitech BRIO (índice 1, DirectShow) foi validada pelo usuário. A precisão das contagens e os ensaios de falha da maquete ainda precisam de evidências próprias.
-- `computer-vision/traffic.py` implementa a Etapa 3: modo automático/manual, mediana de contagens de carros por 2 segundos, verde observado de 8–25 segundos, via sem câmera com 12 segundos, ciclo fixo na ausência de medição e protocolo ST1 com validade/ACK. COM5 permanece como padrão. Não usa pessoas como pedidos de travessia.
+- `computer-vision/traffic.py` implementa o controlador local com mediacoes independentes A/B, filtros por via e prioridade automatica para a unica aproximacao com carro parado. O verde da via que cede pode ser 0, sempre passando por amarelo e ambos vermelhos. Falhas de cameras nao viram demanda nem zero.
 - `arduino/arduino_code.ino` implementa fases sem `delay()`, amarelo de 3 segundos, ambos vermelhos por 1 segundo, limites de verde inclusive no manual e watchdog de comunicação de 4 segundos. Inicia em ambos vermelhos e passa ao ciclo fixo. O firmware informa fase e aceitação de comandos; não há confirmação elétrica dos LEDs. O novo Python exige esse firmware; o protocolo antigo A/B não é compatível.
 - `database/` contém schema MySQL V2.1, seed, Compose, documentação e scripts SQL de validação. O modelo prevê leituras por via, fases, alertas, eventos e telemetria. A existência dos arquivos não comprova banco em execução ou conexão com a API.
 - `api/` contém API NestJS/Prisma com autenticação, chave de ingestão e reenvios idempotentes de leituras, fases e telemetria. `computer-vision/ingestion.py` coleta snapshots em thread própria e envia por outra thread, com fila SQLite persistente, timeout e tentativas limitadas. No ambiente local, câmera, computador e Arduino foram cadastrados; dados reais já foram persistidos e consultados pela API em 10/11/2026.
@@ -46,7 +49,7 @@ Webcam da Via A ─> aplicação Python local ─> controlador local ─> Arduin
 
 O stream Flask local pode permanecer como ferramenta de configuração e diagnóstico das câmeras. A plataforma web e o mobile devem obter dados operacionais pela API. Não exponha a chave de ingestão no navegador ou no aplicativo mobile.
 
-A segunda câmera será adicionada à aplicação Python somente após a validação da primeira entrega, reutilizando API, banco e clientes.
+A segunda camera esta sendo integrada em uma captura independente por via; indices OpenCV, ROIs, estados e streams devem permanecer separados.
 
 ## Plano por etapas
 
@@ -157,7 +160,7 @@ A captura e a operação física dos semáforos com os tempos definidos foram va
 
 A Etapa 4 foi implementada e exercitada no ambiente local em 10/11/2026. Evidências em `computer-vision/VALIDACAO_ETAPA4.md`: 45 testes Python, 4 testes unitários da API, 6 testes de integração com MySQL separado, build/lint, verificação do schema V2.1, leituras reais somente da Via A, fases recebidas do Arduino e recuperação após interrupção da API. A chave fica em arquivo local ignorado pelo Git; a fila mantém os eventos pendentes. Os tempos cadastrados no banco local foram alinhados aos 12/25 segundos da maquete.
 
-A próxima entrega é a Etapa 5: validar a plataforma com os dados reais já persistidos, incluindo via B sem medição, estados reportados dos dois sinais, atualização e dados antigos/indisponíveis. O aplicativo mobile pertence à Etapa 6, e a segunda câmera à Etapa 8.
+A Etapa 5 está implementada no frontend: a Visão geral consulta leituras QUADRO da Via A e últimas leituras de ambas as vias, associa a câmera cadastrada à via, atualiza a tela periodicamente, mostra B sem medição e indica contagens/telemetria/fases desatualizadas. O gráfico apresenta amostras isoladas, sem somar um objeto repetido entre quadros. Falta conferir o login e essas telas no Vite local com a API em execução e observar as próximas atualizações. O aplicativo mobile pertence à Etapa 6, e a segunda câmera à Etapa 8.
 
 ## Regras de trabalho para cada etapa
 
