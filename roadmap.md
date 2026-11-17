@@ -25,7 +25,7 @@ O controle físico deve continuar no computador local e no Arduino. A operação
 
 Antes de implementar cada etapa, reexamine os arquivos atuais. Este resumo reúne a inspeção de 05/11/2026 e a revisão de visão computacional e plataforma em 09/11/2026; código existente não comprova execução integrada.
 
-- `computer-vision/Teste_camera.py` é a entrada principal de uma câmera, configurável por índice e via observada (A por padrão). `vision.py` separa captura e detecção em threads, delimita uma região de contagem, tenta reconectar a câmera e invalida leituras antigas ou produzidas antes de uma desconexão. Um rastreador simples de centros das caixas estima veículos parados na região configurada; não identifica veículos únicos nem estima comprimento de fila.
+- `computer-vision/smarttraffic_app.py` é a entrada principal de uma câmera, configurável por índice e via observada (A por padrão). `vision.py` separa captura e detecção em threads, delimita uma região de contagem, tenta reconectar a câmera e invalida leituras antigas ou produzidas antes de uma desconexão. Um rastreador simples de centros das caixas estima veículos parados na região configurada; não identifica veículos únicos nem estima comprimento de fila.
 - `computer-vision/Smartrafic_web.py` é um atalho para a mesma aplicação, sem abrir outra câmera. A configuração e a execução estão documentadas no README.
 - A captura da Logitech BRIO (índice 1, DirectShow) foi validada pelo usuário. A precisão das contagens e os ensaios de falha da maquete ainda precisam de evidências próprias.
 - `computer-vision/traffic.py` implementa o controlador local com mediacoes independentes A/B, filtros por via e prioridade automatica para a unica aproximacao com carro parado. O verde da via que cede pode ser 0, sempre passando por amarelo e ambos vermelhos. Falhas de cameras nao viram demanda nem zero.
@@ -55,7 +55,7 @@ A segunda camera esta sendo integrada em uma captura independente por via; indic
 
 ### Etapa 1 — Consolidar a aplicação com uma câmera
 
-- Revisar `Teste_camera.py`, `Smartrafic_web.py`, template e README.
+- Revisar `smarttraffic_app.py`, `Smartrafic_web.py`, template e README.
 - Escolher um único programa principal e retirar ambiguidades na forma de iniciar o sistema.
 - Configurar uma câmera ativa: índice, via observada, resolução e taxa de captura. A inicialização não deve exigir uma segunda webcam.
 - Separar captura, detecção e controle para que as transições dos semáforos não congelem o vídeo.
